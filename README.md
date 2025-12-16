@@ -52,9 +52,9 @@ Usage: nix-bonsai [OPTIONS]
 
 Options:
   -s, --seed INT        Random seed (default: random)
-  -L, --life INT        Tree life/growth amount (default: 32)
-  -t, --time FLOAT      Animation delay in seconds (default: 0.08)
-  -M, --multiplier INT  Branch multiplier (default: 5)
+  -L, --life INT        Tree life/growth amount (default: 40)
+  -t, --time FLOAT      Animation delay in seconds (default: 0.05)
+  -M, --multiplier INT  Branch multiplier (default: 7)
   -p, --print           Print mode: show final tree and exit
   -h, --help            Show this help
 ```

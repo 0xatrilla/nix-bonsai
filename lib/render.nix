@@ -14,15 +14,28 @@ let
     # Move cursor to position (1-indexed)
     moveTo = x: y: "${esc}[${toString y};${toString x}H";
     
-    # Colors
+    # Colors - expanded palette for detailed tree
     colors = {
-      brown = "${esc}[38;5;94m";      # Trunk
-      darkBrown = "${esc}[38;5;52m";  # Old trunk
-      green = "${esc}[38;5;34m";      # Leaves
-      lightGreen = "${esc}[38;5;82m"; # Young leaves
-      yellow = "${esc}[38;5;226m";    # Autumn leaves
-      red = "${esc}[38;5;196m";       # Berries
-      white = "${esc}[38;5;255m";     # Flowers
+      # Trunk colors
+      brown = "${esc}[38;5;94m";       # Main trunk
+      darkBrown = "${esc}[38;5;52m";   # Old trunk/bark
+      lightBrown = "${esc}[38;5;137m"; # Young branches
+      
+      # Leaf colors - variety for visual richness
+      green = "${esc}[38;5;34m";       # Standard leaves
+      darkGreen = "${esc}[38;5;22m";   # Mature leaves
+      lightGreen = "${esc}[38;5;82m";  # Young leaves
+      lime = "${esc}[38;5;118m";       # Bright new growth
+      teal = "${esc}[38;5;30m";        # Blue-green
+      
+      # Accent colors
+      yellow = "${esc}[38;5;226m";     # Autumn/flowers
+      gold = "${esc}[38;5;220m";       # Golden accents
+      orange = "${esc}[38;5;208m";     # Autumn
+      red = "${esc}[38;5;196m";        # Berries/flowers
+      pink = "${esc}[38;5;213m";       # Cherry blossoms
+      white = "${esc}[38;5;255m";      # Flowers
+      magenta = "${esc}[38;5;201m";    # Exotic flowers
     };
     
     # Bold
@@ -32,19 +45,31 @@ let
   # Choose color based on segment type and properties
   getSegmentColor = segment:
     if segment.isLeaf or false then
-      # Leaves get various colors
+      # Leaves get various colors based on character
       if segment.char == "&" then ansi.colors.green
+      else if segment.char == "♣" then ansi.colors.darkGreen
+      else if segment.char == "♠" then ansi.colors.teal
+      else if segment.char == "✿" || segment.char == "❀" then ansi.colors.pink
+      else if segment.char == "❁" || segment.char == "✾" then ansi.colors.magenta
+      else if segment.char == "※" then ansi.colors.lime
+      else if segment.char == "☘" then ansi.colors.lightGreen
       else if segment.char == "*" then ansi.colors.lightGreen
       else if segment.char == "%" then ansi.colors.yellow
       else if segment.char == "#" then ansi.colors.red
       else if segment.char == "@" then ansi.colors.white
+      else if segment.char == "○" then ansi.colors.white
+      else if segment.char == "●" then ansi.colors.gold
+      else if segment.char == "✦" then ansi.colors.yellow
+      else if segment.char == "❧" then ansi.colors.orange
       else ansi.colors.green
     else if segment.type == 0 then  # trunk
       ansi.colors.brown
-    else if segment.type == 1 || segment.type == 2 then  # shoots
+    else if segment.type == 1 || segment.type == 2 then  # shoots (main)
       ansi.colors.darkBrown
-    else if segment.type == 3 then  # dying
-      ansi.colors.brown
+    else if segment.type == 3 || segment.type == 4 then  # secondary branches
+      ansi.colors.lightBrown
+    else if segment.type == 5 then  # dying
+      ansi.colors.lightBrown
     else
       ansi.colors.green;
   
@@ -145,13 +170,30 @@ let
         in
         "${ansi.clear}${ansi.home}" + gridToString gridWithTree visibleSegments xOffset yOffset;
       
-      # Generate a frame for every segment for detailed animation
+      # Generate frames with smart batching for smooth animation
       totalSegments = builtins.length segments;
       
-      # Show every individual segment for smooth, detailed growth
-      frameIndices = lib.genList (n: n + 1) totalSegments;
+      # Target ~150-200 frames max for good performance
+      # Batch size scales with tree complexity
+      batchSize = 
+        if totalSegments > 500 then 4
+        else if totalSegments > 200 then 3
+        else if totalSegments > 100 then 2
+        else 1;
+      
+      numFrames = (totalSegments / batchSize) + 1;
+      
+      frameIndices = lib.filter (n: n > 0 && n <= totalSegments)
+        (lib.genList (n: (n + 1) * batchSize) numFrames);
+      
+      # Always include the final frame
+      finalIndices = 
+        if frameIndices == [] then [ totalSegments ]
+        else if lib.last frameIndices != totalSegments 
+        then frameIndices ++ [ totalSegments ]
+        else frameIndices;
     in
-    map makeFrame frameIndices;
+    map makeFrame finalIndices;
   
   # Render complete tree (static, no animation)
   renderTree = treeResult:

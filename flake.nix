@@ -21,9 +21,9 @@
           text = ''
             # Default configuration
             SEED="''${BONSAI_SEED:-$RANDOM}"
-            LIFE="''${BONSAI_LIFE:-32}"
-            TIME="''${BONSAI_TIME:-0.08}"
-            MULTIPLIER="''${BONSAI_MULTIPLIER:-5}"
+            LIFE="''${BONSAI_LIFE:-40}"
+            TIME="''${BONSAI_TIME:-0.05}"
+            MULTIPLIER="''${BONSAI_MULTIPLIER:-7}"
             PRINT_MODE=false
 
             # Parse command line arguments
@@ -41,9 +41,9 @@
                   echo ""
                   echo "Options:"
                   echo "  -s, --seed INT        Random seed (default: random)"
-                  echo "  -L, --life INT        Tree life/growth amount (default: 32)"
-                  echo "  -t, --time FLOAT      Animation delay in seconds (default: 0.08)"
-                  echo "  -M, --multiplier INT  Branch multiplier (default: 5)"
+                  echo "  -L, --life INT        Tree life/growth amount (default: 40)"
+                  echo "  -t, --time FLOAT      Animation delay in seconds (default: 0.05)"
+                  echo "  -M, --multiplier INT  Branch multiplier (default: 7)"
                   echo "  -p, --print           Print mode: show final tree and exit"
                   echo "  -h, --help            Show this help"
                   exit 0
