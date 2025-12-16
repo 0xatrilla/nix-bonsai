@@ -2,6 +2,9 @@
 
 A bonsai tree generator written in **100% pure Nix**, inspired by [cbonsai](https://gitlab.com/jallbrit/cbonsai).
 
+<img width="500" height="500" alt="Screenshot 2025-12-16 at 02 51 07" src="https://github.com/user-attachments/assets/699970c4-7551-4c70-b01f-ed0116f9338e" />
+
+
 ## Features
 
 - **Pure Nix Implementation**: Tree generation algorithm written entirely in Nix expressions
